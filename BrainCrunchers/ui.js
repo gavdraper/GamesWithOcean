@@ -23,9 +23,8 @@ const UI = {
             this.showStats();
         });
 
-        // Table select
-        document.getElementById('back-to-menu-btn').addEventListener('click', () => {
-            this.showScreen('menu-screen');
+        document.getElementById('exit-btn').addEventListener('click', () => {
+            window.location.href = '../index.html';
         });
 
         // Stats
@@ -33,11 +32,28 @@ const UI = {
             this.showScreen('menu-screen');
         });
 
-        // Game
+        // Game - keyboard input (still available for desktop)
         document.getElementById('answer-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 this.submitAnswer();
             }
+        });
+
+        // Number pad buttons
+        document.querySelectorAll('.num-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const action = btn.dataset.action;
+                const num = btn.dataset.num;
+
+                if (action === 'clear') {
+                    this.clearAnswer();
+                } else if (action === 'submit') {
+                    this.submitAnswer();
+                } else if (num) {
+                    this.addDigit(num);
+                }
+            });
         });
 
 
@@ -92,6 +108,8 @@ const UI = {
                 this.showTableSelect();
             } else if (e.key === 's' || e.key === 'S') {
                 this.showStats();
+            } else if (e.key === 'e' || e.key === 'E') {
+                window.location.href = '../index.html';
             }
         }
 
@@ -272,9 +290,21 @@ const UI = {
     updateQuestion(question) {
         document.getElementById('question').textContent =
             `${Game.getCurrentTable()} × ${question.multiplier} = ?`;
-        document.getElementById('answer-input').value = '';
+        this.clearAnswer();
         document.getElementById('feedback').textContent = '';
         document.getElementById('feedback').className = 'feedback';
+    },
+
+    // Add digit to answer
+    addDigit(digit) {
+        const input = document.getElementById('answer-input');
+        input.value += digit;
+    },
+
+    // Clear answer
+    clearAnswer() {
+        const input = document.getElementById('answer-input');
+        input.value = '';
     },
 
     // Submit answer

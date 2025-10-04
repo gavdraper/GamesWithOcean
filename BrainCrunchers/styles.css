@@ -39,7 +39,22 @@ body {
     flex-direction: column;
 }
 
-#table-select-screen > *, #stats-screen .stats-content {
+#table-select-screen {
+    overflow: visible;
+}
+
+#table-select-screen > * {
+    background: rgba(26, 26, 46, 0.95);
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 900px;
+    width: auto;
+    border: 1px solid rgba(255, 214, 10, 0.2);
+    margin: 20px;
+}
+
+#stats-screen .stats-content {
     background: rgba(26, 26, 46, 0.95);
     border-radius: 15px;
     padding: 40px;
@@ -430,22 +445,27 @@ body {
 
 .question-area {
     position: fixed;
-    bottom: 60px;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
     z-index: 100;
+    max-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 .question {
-    font-size: 3em;
+    font-size: 2.5em;
     color: #1a1a2e;
     font-weight: bold;
-    padding: 25px 40px;
+    padding: 20px 35px;
     background: linear-gradient(135deg, #ffd60a 0%, #fca311 100%);
-    border-radius: 20px;
+    border-radius: 15px;
     display: block;
-    min-width: 350px;
+    min-width: 300px;
     box-shadow:
         0 10px 40px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -458,14 +478,14 @@ body {
 }
 
 .answer-input {
-    font-size: 2.2em;
-    padding: 18px 25px;
+    font-size: 1.8em;
+    padding: 15px 20px;
     border: 3px solid rgba(255, 214, 10, 0.4);
     border-radius: 15px;
-    width: 400px;
+    width: 300px;
     text-align: center;
-    margin-top: 50px;
-    margin-bottom: 20px;
+    margin-top: 20px;
+    margin-bottom: 10px;
     background: rgba(26, 26, 46, 0.85);
     color: #ffd60a;
     font-weight: bold;
@@ -489,10 +509,11 @@ body {
 }
 
 .feedback {
-    margin-top: 15px;
-    font-size: 1.8em;
+    margin-top: 10px;
+    margin-bottom: 5px;
+    font-size: 1.3em;
     font-weight: bold;
-    min-height: 40px;
+    min-height: 30px;
     text-shadow:
         0 0 20px currentColor,
         2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -506,6 +527,67 @@ body {
 .feedback.wrong {
     color: #ef476f;
     animation: shake 0.5s;
+}
+
+/* Number Pad */
+.number-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.num-btn {
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 15px;
+    border: 3px solid rgba(255, 214, 10, 0.4);
+    border-radius: 12px;
+    background: rgba(26, 26, 46, 0.85);
+    color: #ffd60a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.num-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.num-btn:hover {
+    border-color: #ffd60a;
+    background: rgba(255, 214, 10, 0.1);
+    box-shadow: 0 6px 20px rgba(255, 214, 10, 0.3);
+}
+
+.clear-btn {
+    background: rgba(239, 71, 111, 0.2);
+    border-color: rgba(239, 71, 111, 0.4);
+    color: #ef476f;
+}
+
+.clear-btn:hover {
+    background: rgba(239, 71, 111, 0.3);
+    border-color: #ef476f;
+}
+
+.submit-btn {
+    background: rgba(6, 214, 160, 0.2);
+    border-color: rgba(6, 214, 160, 0.4);
+    color: #06d6a0;
+    font-size: 1.6em;
+}
+
+.submit-btn:hover {
+    background: rgba(6, 214, 160, 0.3);
+    border-color: #06d6a0;
 }
 
 /* Menu item focus/selection styles */
@@ -646,13 +728,36 @@ body {
     }
 
     .question {
-        font-size: 2em;
+        font-size: 1.8em;
         min-width: 200px;
+        padding: 15px 25px;
     }
 
     .answer-input {
-        font-size: 1.5em;
-        width: 150px;
+        font-size: 1.4em;
+        width: 200px;
+        padding: 12px 15px;
+        margin-top: 15px;
+    }
+
+    .feedback {
+        font-size: 1.1em;
+        min-height: 25px;
+    }
+
+    .number-pad {
+        gap: 6px;
+        max-width: 220px;
+        margin-top: 8px;
+    }
+
+    .num-btn {
+        font-size: 1.3em;
+        padding: 12px;
+    }
+
+    .submit-btn {
+        font-size: 1.4em;
     }
 
     .stat-value {

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Brain Crunchers</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
@@ -13,13 +13,13 @@
         <div class="menu-buttons">
             <button id="play-btn" class="menu-btn">PLAY <span class="hotkey">(P)</span></button>
             <button id="stats-btn" class="menu-btn">STATS <span class="hotkey">(S)</span></button>
+            <button id="exit-btn" class="menu-btn">EXIT <span class="hotkey">(E)</span></button>
         </div>
     </div>
 
     <div id="table-select-screen" class="screen">
         <h2 class="screen-title">Choose Your Times Table <span class="hint">(Press 2-12 or ESC)</span></h2>
         <div id="table-buttons" class="table-grid"></div>
-        <button id="back-to-menu-btn" class="back-btn">← BACK <span class="hotkey">(ESC)</span></button>
     </div>
 
     <div id="stats-screen" class="screen">
@@ -72,6 +72,21 @@
                 <div id="question" class="question">? × ? = ?</div>
                 <input type="number" id="answer-input" class="answer-input" placeholder="?">
                 <div id="feedback" class="feedback"></div>
+
+                <div id="number-pad" class="number-pad">
+                    <button class="num-btn" data-num="7">7</button>
+                    <button class="num-btn" data-num="8">8</button>
+                    <button class="num-btn" data-num="9">9</button>
+                    <button class="num-btn" data-num="4">4</button>
+                    <button class="num-btn" data-num="5">5</button>
+                    <button class="num-btn" data-num="6">6</button>
+                    <button class="num-btn" data-num="1">1</button>
+                    <button class="num-btn" data-num="2">2</button>
+                    <button class="num-btn" data-num="3">3</button>
+                    <button class="num-btn clear-btn" data-action="clear">C</button>
+                    <button class="num-btn" data-num="0">0</button>
+                    <button class="num-btn submit-btn" data-action="submit">✓</button>
+                </div>
             </div>
         </div>
 
