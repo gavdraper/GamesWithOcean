@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Crunchers</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.80.1/dist/phaser.min.js"></script>
+</head>
+<body>
+    <div id="menu-screen" class="screen active">
+        <h1 class="game-title">🧠 BRAIN CRUNCHERS 🧟</h1>
+        <div class="menu-buttons">
+            <button id="play-btn" class="menu-btn">PLAY <span class="hotkey">(P)</span></button>
+            <button id="stats-btn" class="menu-btn">STATS <span class="hotkey">(S)</span></button>
+        </div>
+    </div>
+
+    <div id="table-select-screen" class="screen">
+        <h2 class="screen-title">Choose Your Times Table <span class="hint">(Press 2-12 or ESC)</span></h2>
+        <div id="table-buttons" class="table-grid"></div>
+        <button id="back-to-menu-btn" class="back-btn">← BACK <span class="hotkey">(ESC)</span></button>
+    </div>
+
+    <div id="stats-screen" class="screen">
+        <div class="stats-content">
+            <h2 class="screen-title">STATISTICS</h2>
+            <div class="stats-container">
+                <div class="stat-box">
+                    <div class="stat-label">Games Played</div>
+                    <div id="total-games" class="stat-value">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Most Played</div>
+                    <div id="most-played" class="stat-value">-</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Time Played</div>
+                    <div id="total-time" class="stat-value">0m</div>
+                </div>
+            </div>
+            <div class="table-times-container">
+                <h3 class="table-times-title">Time Per Table</h3>
+                <div id="table-times" class="table-times-grid"></div>
+            </div>
+            <button id="back-from-stats-btn" class="back-btn">← BACK <span class="hotkey">(ESC)</span></button>
+        </div>
+    </div>
+
+    <div id="game-screen" class="screen">
+        <div class="game-header">
+            <div class="game-info">
+                <div class="info-item">
+                    <span class="info-label">Table:</span>
+                    <span id="current-table" class="info-value">2</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Score:</span>
+                    <span id="current-score" class="info-value">0</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Time:</span>
+                    <span id="question-timer" class="info-value">0.0s</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-area">
+            <div id="phaser-game"></div>
+
+            <div class="question-area">
+                <div id="question" class="question">? × ? = ?</div>
+                <input type="number" id="answer-input" class="answer-input" placeholder="?">
+                <div id="feedback" class="feedback"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="game-over-screen" class="screen">
+        <h2 class="game-over-title">GAME OVER!</h2>
+        <div class="game-over-image">💀🧟</div>
+        <div id="game-over-message" class="game-over-message">The zombie got you!</div>
+        <div class="game-over-stats">
+            <div class="game-over-stat">
+                <span class="stat-label">Correct Answers:</span>
+                <span id="final-correct" class="stat-value">0</span>
+            </div>
+            <div class="game-over-stat">
+                <span class="stat-label">New Ranking:</span>
+                <span id="final-ranking" class="stat-value">0</span>
+            </div>
+        </div>
+        <div class="menu-buttons">
+            <button id="play-again-btn" class="menu-btn">PLAY AGAIN <span class="hotkey">(ENTER)</span></button>
+            <button id="menu-btn" class="menu-btn">MENU <span class="hotkey">(M)</span></button>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="storage.js"></script>
+    <script src="phaserGame.js"></script>
+    <script src="game.js"></script>
+    <script src="ui.js"></script>
+</body>
+</html>
