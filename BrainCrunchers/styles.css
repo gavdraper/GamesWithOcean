@@ -441,6 +441,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 1;
 }
 
 .question-area {
@@ -449,7 +450,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     text-align: center;
-    z-index: 100;
+    z-index: 200;
     max-height: calc(100vh - 120px);
     display: flex;
     flex-direction: column;
@@ -458,18 +459,18 @@ body {
 }
 
 .question {
-    font-size: 2.5em;
+    font-size: 1.8em;
     color: #1a1a2e;
     font-weight: bold;
-    padding: 20px 35px;
+    padding: 12px 25px;
     background: linear-gradient(135deg, #ffd60a 0%, #fca311 100%);
-    border-radius: 15px;
+    border-radius: 12px;
     display: block;
-    min-width: 300px;
+    min-width: 200px;
     box-shadow:
-        0 10px 40px rgba(0, 0, 0, 0.3),
+        0 8px 30px rgba(0, 0, 0, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.3);
-    border: 3px solid rgba(26, 26, 46, 0.2);
+    border: 2px solid rgba(26, 26, 46, 0.2);
     transition: all 0.2s ease;
 }
 
@@ -477,43 +478,31 @@ body {
     transform: scale(1.02);
 }
 
-.answer-input {
-    font-size: 1.8em;
-    padding: 15px 20px;
-    border: 3px solid rgba(255, 214, 10, 0.4);
-    border-radius: 15px;
-    width: 300px;
+.answer-display {
+    font-size: 1.5em;
+    padding: 8px 12px;
+    border: 2px solid rgba(255, 214, 10, 0.4);
+    border-radius: 10px;
+    width: 160px;
     text-align: center;
-    margin-top: 20px;
-    margin-bottom: 10px;
+    margin-top: 10px;
+    margin-bottom: 6px;
     background: rgba(26, 26, 46, 0.85);
     color: #ffd60a;
     font-weight: bold;
-    transition: all 0.2s ease;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.4);
     backdrop-filter: blur(10px);
     display: block;
-}
-
-.answer-input::placeholder {
-    color: rgba(255, 214, 10, 0.4);
-}
-
-.answer-input:focus {
-    outline: none;
-    transform: scale(1.03);
-    border-color: #ffd60a;
-    box-shadow:
-        0 0 0 4px rgba(255, 214, 10, 0.2),
-        0 10px 40px rgba(0, 0, 0, 0.5);
+    min-height: 38px;
+    line-height: 38px;
 }
 
 .feedback {
-    margin-top: 10px;
-    margin-bottom: 5px;
-    font-size: 1.3em;
+    margin-top: 6px;
+    margin-bottom: 4px;
+    font-size: 1em;
     font-weight: bold;
-    min-height: 30px;
+    min-height: 24px;
     text-shadow:
         0 0 20px currentColor,
         2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -533,19 +522,19 @@ body {
 .number-pad {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    margin-top: 10px;
-    max-width: 280px;
+    gap: 6px;
+    margin-top: 8px;
+    max-width: 220px;
     margin-left: auto;
     margin-right: auto;
 }
 
 .num-btn {
-    font-size: 1.5em;
+    font-size: 1.3em;
     font-weight: bold;
-    padding: 15px;
-    border: 3px solid rgba(255, 214, 10, 0.4);
-    border-radius: 12px;
+    padding: 12px;
+    border: 2px solid rgba(255, 214, 10, 0.4);
+    border-radius: 10px;
     background: rgba(26, 26, 46, 0.85);
     color: #ffd60a;
     cursor: pointer;
@@ -701,63 +690,116 @@ body {
     }
 
     .screen-title {
-        font-size: 2em;
+        font-size: 1.8em;
+        margin-bottom: 20px;
+    }
+
+    .hint {
+        font-size: 0.4em;
+        display: block;
+        margin-top: 5px;
+    }
+
+    .table-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        max-width: 100%;
+    }
+
+    .table-btn {
+        padding: 20px 10px;
+        font-size: 1.5em;
+    }
+
+    .table-btn .ranking {
+        font-size: 0.45em;
+    }
+
+    .game-header {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .game-info {
+        padding: 12px 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .info-item {
+        flex: 1 1 30%;
+        min-width: 80px;
+    }
+
+    .info-label {
+        font-size: 0.7em;
+        margin-bottom: 4px;
+    }
+
+    .info-value {
+        font-size: 1.5em;
     }
 }
 
 @media (max-width: 600px) {
     .game-title {
-        font-size: 2.5em;
-        margin-top: 40px;
-        margin-bottom: 50px;
+        font-size: 2em;
+        margin-top: 30px;
+        margin-bottom: 40px;
+        padding: 0 10px;
     }
 
     .menu-btn {
-        font-size: 1.2em;
+        font-size: 1.1em;
         width: 90%;
-        padding: 15px 40px;
+        max-width: 300px;
+        padding: 15px 30px;
     }
 
     .game-over-title {
-        font-size: 2.5em;
-        margin-top: 40px;
+        font-size: 2em;
+        margin-top: 30px;
     }
 
     .game-over-image {
-        font-size: 4em;
+        font-size: 3.5em;
     }
 
     .question {
-        font-size: 1.8em;
-        min-width: 200px;
-        padding: 15px 25px;
+        font-size: 1.6em;
+        min-width: 180px;
+        padding: 12px 20px;
     }
 
-    .answer-input {
-        font-size: 1.4em;
-        width: 200px;
+    .answer-display {
+        font-size: 2em;
+        width: 240px;
         padding: 12px 15px;
-        margin-top: 15px;
+        margin-top: 12px;
+        min-height: 50px;
+        line-height: 50px;
     }
 
     .feedback {
-        font-size: 1.1em;
-        min-height: 25px;
+        font-size: 1em;
+        min-height: 20px;
     }
 
     .number-pad {
         gap: 6px;
-        max-width: 220px;
+        max-width: 240px;
         margin-top: 8px;
     }
 
     .num-btn {
-        font-size: 1.3em;
-        padding: 12px;
+        font-size: 1.2em;
+        padding: 12px 8px;
+        border-width: 2px;
     }
 
     .submit-btn {
-        font-size: 1.4em;
+        font-size: 1.3em;
     }
 
     .stat-value {
@@ -766,5 +808,162 @@ body {
 
     .table-time-item .table-num {
         font-size: 1.1em;
+    }
+
+    .question-area {
+        bottom: 10px;
+    }
+}
+
+/* Extra small phones */
+@media (max-width: 400px) {
+    .game-title {
+        font-size: 1.5em;
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+
+    .screen-title {
+        font-size: 1.4em;
+    }
+
+    .table-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .table-btn {
+        padding: 15px 8px;
+        font-size: 1.3em;
+    }
+
+    .question {
+        font-size: 1.3em;
+        min-width: 150px;
+        padding: 10px 15px;
+    }
+
+    .answer-display {
+        font-size: 1.6em;
+        width: 200px;
+        padding: 10px;
+        min-height: 45px;
+        line-height: 45px;
+    }
+
+    .number-pad {
+        max-width: 200px;
+        gap: 5px;
+    }
+
+    .num-btn {
+        font-size: 1.1em;
+        padding: 10px 6px;
+    }
+
+    .info-label {
+        font-size: 0.6em;
+    }
+
+    .info-value {
+        font-size: 1.2em;
+    }
+}
+
+/* Landscape mode adjustments */
+@media (max-height: 600px) and (orientation: landscape) {
+    .game-title {
+        font-size: 2em;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+
+    .menu-buttons {
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .menu-btn {
+        padding: 12px 60px;
+        font-size: 1.1em;
+    }
+
+    .table-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 8px;
+    }
+
+    .table-btn {
+        padding: 12px 8px;
+        font-size: 1.3em;
+    }
+
+    .screen-title {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    #table-select-screen > * {
+        padding: 20px;
+        margin: 10px;
+    }
+
+    #stats-screen .stats-content {
+        padding: 20px;
+        max-height: 90vh;
+    }
+
+    .game-header {
+        top: 5px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .game-info {
+        padding: 8px 15px;
+    }
+
+    .info-label {
+        font-size: 0.65em;
+        margin-bottom: 2px;
+    }
+
+    .info-value {
+        font-size: 1.3em;
+    }
+
+    .question {
+        font-size: 1.4em;
+        padding: 10px 20px;
+    }
+
+    .answer-display {
+        font-size: 1.6em;
+        width: 200px;
+        padding: 8px 15px;
+        margin-top: 8px;
+        min-height: 40px;
+        line-height: 40px;
+    }
+
+    .number-pad {
+        max-width: 210px;
+        gap: 5px;
+        margin-top: 5px;
+    }
+
+    .num-btn {
+        font-size: 1.1em;
+        padding: 8px;
+    }
+
+    .question-area {
+        bottom: 5px;
+    }
+
+    .feedback {
+        font-size: 0.9em;
+        margin-top: 5px;
+        min-height: 18px;
     }
 }

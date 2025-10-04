@@ -26,14 +26,15 @@ class GameScene extends Phaser.Scene {
         overlay.fillStyle(0x000000, 0.1);
         overlay.fillRect(0, 0, width, height);
 
-        // Create player sprite
-        this.player = this.add.sprite(150, height / 2, 'player');
+        // Create player sprite - positioned higher to avoid UI overlap
+        const verticalOffset = height * 0.35; // Position at 35% from top instead of 50%
+        this.player = this.add.sprite(150, verticalOffset, 'player');
         this.player.setScale(3);
         this.player.setDepth(10);
         console.log('Player created at:', this.player.x, this.player.y, 'Visible:', this.player.visible);
 
         // Create zombie sprite
-        this.zombie = this.add.sprite(width - 150, height / 2, 'zombie');
+        this.zombie = this.add.sprite(width - 150, verticalOffset, 'zombie');
         this.zombie.setScale(3);
         this.zombie.setFlipX(true); // Face the player
         this.zombie.setDepth(10);

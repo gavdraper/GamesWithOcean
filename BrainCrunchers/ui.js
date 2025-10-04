@@ -33,9 +33,14 @@ const UI = {
         });
 
         // Game - keyboard input (still available for desktop)
-        document.getElementById('answer-input').addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                this.submitAnswer();
+        document.addEventListener('keypress', (e) => {
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen && activeScreen.id === 'game-screen') {
+                if (e.key === 'Enter') {
+                    this.submitAnswer();
+                } else if (e.key >= '0' && e.key <= '9') {
+                    this.addDigit(e.key);
+                }
             }
         });
 
@@ -266,7 +271,7 @@ const UI = {
 
         this.updateQuestion(Game.getCurrentQuestion());
 
-        document.getElementById('answer-input').value = '';
+        document.getElementById('answer-display').textContent = '?';
         document.getElementById('feedback').textContent = '';
         document.getElementById('feedback').className = 'feedback';
 
@@ -280,9 +285,6 @@ const UI = {
             } else {
                 PhaserGameManager.reset();
             }
-
-            // Focus on input
-            document.getElementById('answer-input').focus();
         }, 100);
     },
 
@@ -297,22 +299,26 @@ const UI = {
 
     // Add digit to answer
     addDigit(digit) {
-        const input = document.getElementById('answer-input');
-        input.value += digit;
+        const display = document.getElementById('answer-display');
+        if (display.textContent === '?') {
+            display.textContent = digit;
+        } else {
+            display.textContent += digit;
+        }
     },
 
     // Clear answer
     clearAnswer() {
-        const input = document.getElementById('answer-input');
-        input.value = '';
+        const display = document.getElementById('answer-display');
+        display.textContent = '?';
     },
 
     // Submit answer
     submitAnswer() {
-        const input = document.getElementById('answer-input');
-        const userAnswer = input.value.trim();
+        const display = document.getElementById('answer-display');
+        const userAnswer = display.textContent.trim();
 
-        if (userAnswer === '') {
+        if (userAnswer === '' || userAnswer === '?') {
             return;
         }
 
