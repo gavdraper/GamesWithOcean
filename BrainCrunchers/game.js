@@ -8,6 +8,7 @@ const Game = {
     gameStartTime: null,
     questionStartTime: null,
     questionTimer: null,
+    questionHistory: {}, // Track question attempts: { "2x3": { attempts: 2, bestTime: 2.5 } }
 
     // Start a new game
     start(tableNumber) {
@@ -16,6 +17,7 @@ const Game = {
         this.zombiePosition = CONFIG.maxZombieDistance;
         this.totalRankingChange = 0;
         this.gameStartTime = Date.now();
+        this.questionHistory = {}; // Reset history for new game
         this.generateQuestion();
         this.startQuestionTimer();
     },
@@ -56,22 +58,43 @@ const Game = {
         return (Date.now() - this.questionStartTime) / 1000;
     },
 
+    // Get adjusted speed thresholds based on question history
+    getAdjustedThresholds() {
+        const questionKey = `${this.currentTable}x${this.currentQuestion.multiplier}`;
+        const history = this.questionHistory[questionKey];
+
+        // If we've seen this question before and answered correctly, expect faster
+        if (history && history.attempts > 0 && history.bestTime) {
+            // Reduce thresholds by 20% for each previous attempt (minimum 50% of original)
+            const reduction = Math.min(0.2 * history.attempts, 0.5);
+            return {
+                fast: CONFIG.speedThresholds.fast * (1 - reduction),
+                medium: CONFIG.speedThresholds.medium * (1 - reduction),
+                slow: CONFIG.speedThresholds.slow * (1 - reduction)
+            };
+        }
+
+        return CONFIG.speedThresholds;
+    },
+
     // Calculate ranking points based on speed
     calculateRankingPoints(isCorrect, timeInSeconds) {
+        const thresholds = this.getAdjustedThresholds();
+
         if (isCorrect) {
-            if (timeInSeconds < CONFIG.speedThresholds.fast) {
+            if (timeInSeconds < thresholds.fast) {
                 return CONFIG.rankingPoints.correct.fast;
-            } else if (timeInSeconds < CONFIG.speedThresholds.medium) {
+            } else if (timeInSeconds < thresholds.medium) {
                 return CONFIG.rankingPoints.correct.medium;
-            } else if (timeInSeconds < CONFIG.speedThresholds.slow) {
+            } else if (timeInSeconds < thresholds.slow) {
                 return CONFIG.rankingPoints.correct.slow;
             } else {
                 return CONFIG.rankingPoints.correct.verySlow;
             }
         } else {
-            if (timeInSeconds < CONFIG.speedThresholds.fast) {
+            if (timeInSeconds < thresholds.fast) {
                 return CONFIG.rankingPoints.wrong.fast;
-            } else if (timeInSeconds < CONFIG.speedThresholds.medium) {
+            } else if (timeInSeconds < thresholds.medium) {
                 return CONFIG.rankingPoints.wrong.medium;
             } else {
                 return CONFIG.rankingPoints.wrong.slow;
@@ -87,7 +110,17 @@ const Game = {
 
         this.totalRankingChange += rankingPoints;
 
+        // Update question history
+        const questionKey = `${this.currentTable}x${this.currentQuestion.multiplier}`;
+        if (!this.questionHistory[questionKey]) {
+            this.questionHistory[questionKey] = { attempts: 0, bestTime: null };
+        }
+
         if (isCorrect) {
+            this.questionHistory[questionKey].attempts++;
+            if (!this.questionHistory[questionKey].bestTime || timeInSeconds < this.questionHistory[questionKey].bestTime) {
+                this.questionHistory[questionKey].bestTime = timeInSeconds;
+            }
             this.correctAnswers++;
             this.handleCorrectAnswer(timeInSeconds, rankingPoints);
         } else {
@@ -99,18 +132,44 @@ const Game = {
 
     // Handle correct answer
     handleCorrectAnswer(timeInSeconds, rankingPoints) {
+        const questionKey = `${this.currentTable}x${this.currentQuestion.multiplier}`;
+        const history = this.questionHistory[questionKey];
+        const thresholds = this.getAdjustedThresholds();
+
         let speedMessage = '';
-        if (timeInSeconds < CONFIG.speedThresholds.fast) {
+        let extraFeedback = '';
+        let speedLevel = 'medium';
+
+        // Determine base speed message using adjusted thresholds
+        if (timeInSeconds < thresholds.fast) {
             speedMessage = '⚡ LIGHTNING FAST!';
-        } else if (timeInSeconds < CONFIG.speedThresholds.medium) {
+            speedLevel = 'fast';
+        } else if (timeInSeconds < thresholds.medium) {
             speedMessage = '🚀 GREAT SPEED!';
-        } else if (timeInSeconds < CONFIG.speedThresholds.slow) {
+            speedLevel = 'medium';
+        } else if (timeInSeconds < thresholds.slow) {
             speedMessage = '👍 GOOD!';
+            speedLevel = 'medium';
         } else {
             speedMessage = '✓ CORRECT';
+            speedLevel = 'slow';
         }
 
-        UI.showFeedback(speedMessage + ` (+${rankingPoints})`, 'correct');
+        // Add improvement feedback for repeated questions
+        if (history && history.attempts > 1) {
+            if (timeInSeconds < history.bestTime) {
+                extraFeedback = ' 🔥 NEW RECORD!';
+            } else if (timeInSeconds <= history.bestTime * 1.2) {
+                extraFeedback = ' 💪 CONSISTENT!';
+            }
+        }
+
+        UI.showFeedback(speedMessage + extraFeedback + ` (+${rankingPoints})`, 'correct', timeInSeconds);
+
+        // Play correct answer sound based on speed
+        if (typeof AudioManager !== 'undefined') {
+            AudioManager.playCorrectSound(speedLevel);
+        }
 
         // Trigger player celebration animation
         if (typeof PhaserGameManager !== 'undefined') {
@@ -119,6 +178,10 @@ const Game = {
 
         // Check if game won
         if (this.correctAnswers >= CONFIG.questionsToWin) {
+            // Play victory sound
+            if (typeof AudioManager !== 'undefined') {
+                AudioManager.playVictorySound();
+            }
             this.endGame(true);
         } else {
             // Generate next question
@@ -136,17 +199,26 @@ const Game = {
         UI.showFeedback(`❌ WRONG! (${rankingPoints})`, 'wrong');
         UI.updateZombiePosition(this.zombiePosition);
 
+        // Play wrong answer sound
+        if (typeof AudioManager !== 'undefined') {
+            AudioManager.playWrongSound();
+        }
+
         // Check if game over
         if (this.zombiePosition <= 0) {
+            console.log('Game over! Zombie position is 0');
             // Trigger zombie attack animation before game over
             this.stopQuestionTimer();
 
+            console.log('PhaserGameManager exists?', typeof PhaserGameManager !== 'undefined');
             if (typeof PhaserGameManager !== 'undefined') {
+                console.log('Calling PhaserGameManager.zombieAttack');
                 PhaserGameManager.zombieAttack(() => {
                     // End game after animation completes
                     this.endGame(false);
                 });
             } else {
+                console.log('PhaserGameManager not found, ending game immediately');
                 this.endGame(false);
             }
         } else {

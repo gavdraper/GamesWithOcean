@@ -26,8 +26,13 @@ class GameScene extends Phaser.Scene {
         overlay.fillStyle(0x000000, 0.1);
         overlay.fillRect(0, 0, width, height);
 
-        // Create player sprite - positioned higher to avoid UI overlap
-        const verticalOffset = height * 0.35; // Position at 35% from top instead of 50%
+        // Create player sprite - positioned below header with margin
+        // Account for header height (approximately 80-100px) plus margin
+        const headerHeight = 100;
+        const topMargin = 40;
+        const availableHeight = height - headerHeight - topMargin;
+        const verticalOffset = headerHeight + topMargin + (availableHeight * 0.4);
+
         this.player = this.add.sprite(150, verticalOffset, 'player');
         this.player.setScale(3);
         this.player.setDepth(10);
@@ -131,6 +136,11 @@ class GameScene extends Phaser.Scene {
             maxDistanceCalc: this.maxDistance
         });
 
+        // Play zombie movement sound
+        if (typeof AudioManager !== 'undefined') {
+            AudioManager.playZombieMove();
+        }
+
         // Smoothly tween zombie to new position
         this.tweens.add({
             targets: this.zombie,
@@ -155,6 +165,9 @@ class GameScene extends Phaser.Scene {
     }
 
     zombieAttack(onComplete) {
+        console.log('zombieAttack called!');
+        console.log('AudioManager exists?', typeof AudioManager !== 'undefined');
+
         // Create two halves of the player for the "rip in half" effect
         const playerY = this.player.y;
         const playerX = this.player.x;
@@ -179,6 +192,15 @@ class GameScene extends Phaser.Scene {
             duration: 300,
             ease: 'Power2',
             onComplete: () => {
+                console.log('Zombie lunge complete - about to play eating sound');
+                // Play gross eating sound when zombie reaches player
+                if (typeof AudioManager !== 'undefined') {
+                    console.log('AudioManager found, calling playZombieEating');
+                    AudioManager.playZombieEating();
+                } else {
+                    console.error('AudioManager not found!');
+                }
+
                 // Shake the zombie to simulate attack
                 this.tweens.add({
                     targets: this.zombie,
@@ -249,10 +271,14 @@ const PhaserGameManager = {
 
     init() {
         const container = document.getElementById('phaser-game');
-        const width = window.innerWidth;
-        const height = window.innerHeight;
 
-        console.log('Initializing Phaser with dimensions:', width, height);
+        // Calculate available space: full viewport minus question area
+        const questionArea = document.querySelector('.question-area');
+        const width = window.innerWidth;
+        const questionHeight = questionArea ? questionArea.offsetHeight : window.innerHeight * 0.4;
+        const height = window.innerHeight - questionHeight;
+
+        console.log('Initializing Phaser with dimensions:', width, height, 'Question area height:', questionHeight);
 
         const config = {
             type: Phaser.AUTO,
@@ -289,8 +315,11 @@ const PhaserGameManager = {
 
         // Handle window resize
         this.resizeHandler = () => {
+            const questionArea = document.querySelector('.question-area');
             const newWidth = window.innerWidth;
-            const newHeight = window.innerHeight;
+            const questionHeight = questionArea ? questionArea.offsetHeight : window.innerHeight * 0.4;
+            const newHeight = window.innerHeight - questionHeight;
+
             this.game.scale.resize(newWidth, newHeight);
 
             // Update sprite positions if scene exists
@@ -321,10 +350,18 @@ const PhaserGameManager = {
     },
 
     zombieAttack(onComplete) {
+        console.log('PhaserGameManager.zombieAttack called');
+        console.log('Scene exists?', !!this.scene);
+        console.log('Scene has zombieAttack method?', !!(this.scene && this.scene.zombieAttack));
+
         if (this.scene && this.scene.zombieAttack) {
+            console.log('Calling scene.zombieAttack');
             this.scene.zombieAttack(onComplete);
-        } else if (onComplete) {
-            onComplete();
+        } else {
+            console.error('Scene or zombieAttack method not available, calling onComplete immediately');
+            if (onComplete) {
+                onComplete();
+            }
         }
     },
 

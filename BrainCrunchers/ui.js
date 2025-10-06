@@ -2,11 +2,19 @@
 const UI = {
     currentFocusIndex: 0,
     focusableElements: [],
+    awaitingNextQuestion: false,
 
     // Initialize UI and event listeners
     init() {
         this.setupEventListeners();
         this.showScreen('menu-screen');
+
+        // Initialize audio on first user interaction
+        document.addEventListener('click', () => {
+            if (typeof AudioManager !== 'undefined') {
+                AudioManager.init();
+            }
+        }, { once: true });
     },
 
     // Setup all event listeners
@@ -16,14 +24,17 @@ const UI = {
 
         // Menu buttons
         document.getElementById('play-btn').addEventListener('click', () => {
+            if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
             this.showTableSelect();
         });
 
         document.getElementById('stats-btn').addEventListener('click', () => {
+            if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
             this.showStats();
         });
 
         document.getElementById('exit-btn').addEventListener('click', () => {
+            if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
             window.location.href = '../index.html';
         });
 
@@ -52,10 +63,13 @@ const UI = {
                 const num = btn.dataset.num;
 
                 if (action === 'clear') {
+                    if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
                     this.clearAnswer();
                 } else if (action === 'submit') {
+                    if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
                     this.submitAnswer();
                 } else if (num) {
+                    if (typeof AudioManager !== 'undefined') AudioManager.playNumberSound();
                     this.addDigit(num);
                 }
             });
@@ -64,10 +78,12 @@ const UI = {
 
         // Game over
         document.getElementById('play-again-btn').addEventListener('click', () => {
+            if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
             this.startGame(Game.getCurrentTable());
         });
 
         document.getElementById('menu-btn').addEventListener('click', () => {
+            if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
             this.showScreen('menu-screen');
         });
     },
@@ -219,6 +235,7 @@ const UI = {
             `;
 
             button.addEventListener('click', () => {
+                if (typeof AudioManager !== 'undefined') AudioManager.playClickSound();
                 this.startGame(table);
             });
 
@@ -271,12 +288,17 @@ const UI = {
 
         this.updateQuestion(Game.getCurrentQuestion());
 
-        document.getElementById('answer-display').textContent = '?';
+        document.getElementById('answer-display').textContent = '';
         document.getElementById('feedback').textContent = '';
         document.getElementById('feedback').className = 'feedback';
 
         // Show screen FIRST so the container has dimensions
         this.showScreen('game-screen');
+
+        // Start background music
+        if (typeof AudioManager !== 'undefined') {
+            AudioManager.startBackgroundMusic();
+        }
 
         // THEN initialize or reset Phaser game after screen is visible
         setTimeout(() => {
@@ -290,46 +312,65 @@ const UI = {
 
     // Update question display
     updateQuestion(question) {
-        document.getElementById('question').textContent =
-            `${Game.getCurrentTable()} × ${question.multiplier} = ?`;
+        const questionElement = document.getElementById('question');
+        questionElement.textContent = `${Game.getCurrentTable()} × ${question.multiplier} =`;
+        questionElement.style.display = '';
         this.clearAnswer();
         document.getElementById('feedback').textContent = '';
         document.getElementById('feedback').className = 'feedback';
+        // Re-enable input for new question
+        this.awaitingNextQuestion = false;
     },
 
     // Add digit to answer
     addDigit(digit) {
         const display = document.getElementById('answer-display');
-        if (display.textContent === '?') {
-            display.textContent = digit;
-        } else {
-            display.textContent += digit;
-        }
+        display.textContent += digit;
     },
 
     // Clear answer
     clearAnswer() {
         const display = document.getElementById('answer-display');
-        display.textContent = '?';
+        display.textContent = '';
     },
 
     // Submit answer
     submitAnswer() {
-        const display = document.getElementById('answer-display');
-        const userAnswer = display.textContent.trim();
-
-        if (userAnswer === '' || userAnswer === '?') {
+        // Prevent duplicate submissions while waiting for next question
+        if (this.awaitingNextQuestion) {
             return;
         }
 
+        const display = document.getElementById('answer-display');
+        const userAnswer = display.textContent.trim();
+
+        if (userAnswer === '') {
+            return;
+        }
+
+        // Set flag to block further submissions
+        this.awaitingNextQuestion = true;
+
         const isCorrect = Game.checkAnswer(userAnswer);
         document.getElementById('current-score').textContent = Game.getCurrentScore();
+
+        // Hide question element immediately so user knows to wait
+        document.getElementById('question').style.display = 'none';
+        this.clearAnswer();
     },
 
     // Show feedback
-    showFeedback(message, type) {
+    showFeedback(message, type, timeInSeconds = null) {
         const feedback = document.getElementById('feedback');
-        feedback.textContent = message;
+
+        // Add time display for correct answers
+        if (type === 'correct' && timeInSeconds !== null) {
+            const timeStr = timeInSeconds.toFixed(1);
+            feedback.innerHTML = `${message}<div class="time-badge">${timeStr}s</div>`;
+        } else {
+            feedback.textContent = message;
+        }
+
         feedback.className = `feedback ${type}`;
     },
 
@@ -347,6 +388,11 @@ const UI = {
         document.getElementById('game-over-message').textContent = message;
         document.getElementById('final-correct').textContent = correctAnswers;
         document.getElementById('final-ranking').textContent = newRanking;
+
+        // Stop background music
+        if (typeof AudioManager !== 'undefined') {
+            AudioManager.stopBackgroundMusic();
+        }
 
         this.showScreen('game-over-screen');
     }
